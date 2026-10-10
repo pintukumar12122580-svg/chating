@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Play Store</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Google Sans',Roboto,Arial,sans-serif;background:#f8f9fa;color:#202124;min-height:100vh}
+.page{max-width:480px;margin:0 auto;background:#fff;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;position:sticky;top:0;background:#fff;z-index:10;border-bottom:1px solid #f0f0f0}
+.topbar svg{width:24px;height:24px;fill:#5f6368}
+.header{display:flex;align-items:flex-start;gap:16px;padding:20px 16px 16px}
+.app-icon{width:64px;height:64px;border-radius:14px;overflow:hidden;border:1px solid #e8e8e8;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#e8f5e9}
+.app-icon img{width:100%;height:100%;object-fit:cover;border-radius:14px}
+.app-name{font-size:20px;font-weight:700;color:#202124;line-height:1.25;margin-bottom:4px}
+.developer{font-size:13px;color:#01875f;font-weight:500;margin-bottom:3px}
+.meta-sm{font-size:12px;color:#5f6368}
+.stats{display:flex;border-top:1px solid #e8e8e8;border-bottom:1px solid #e8e8e8;margin:0 16px}
+.stat{flex:1;text-align:center;padding:12px 4px;position:relative}
+.stat+.stat::before{content:'';position:absolute;left:0;top:18%;height:64%;width:1px;background:#e8e8e8}
+.stat-val{font-size:14px;font-weight:600;color:#202124;display:flex;align-items:center;justify-content:center;gap:3px}
+.stat-lbl{font-size:11px;color:#5f6368;margin-top:2px}
+.gold{color:#FBBC04}
+.btn-wrap{padding:16px}
+.dl-btn{width:100%;padding:13px;background:#1a73e8;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:.3px;text-decoration:none;display:block;text-align:center;transition:background .15s}
+.dl-btn:hover{background:#1557b0}
+.dl-btn.off{background:#e0e0e0;color:#9e9e9e;pointer-events:none}
+.sec-title{font-size:15px;font-weight:700;padding:4px 16px 10px}
+.ss-row{display:flex;gap:10px;overflow-x:auto;padding:0 16px 16px;scrollbar-width:none}
+.ss-row::-webkit-scrollbar{display:none}
+.ss-card{flex-shrink:0;width:140px;height:240px;border-radius:10px;overflow:hidden;background:#f0f0f0;border:1px solid #e8e8e8}
+.ss-card img{width:100%;height:100%;object-fit:cover}
+.ss-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#ccc;gap:6px;font-size:12px}
+.ss-ph svg{width:28px;height:28px;fill:#ccc}
+.divider{height:1px;background:#e8e8e8;margin:0 16px}
+.about-sec{padding:16px}
+.about-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.about-arrow{transition:transform .2s;cursor:pointer;width:20px;height:20px;fill:#5f6368;flex-shrink:0}
+.about-txt{font-size:13.5px;color:#444;line-height:1.65;overflow:hidden}
+.about-txt.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.tag{padding:5px 12px;border-radius:20px;border:1px solid #dadce0;font-size:12px;color:#555}
+
+.rate-sec{padding:16px}
+.rate-sub{font-size:13px;color:#5f6368;margin-bottom:12px}
+.stars-row{display:flex;gap:4px;margin-bottom:12px}
+.s-btn{font-size:32px;color:#e0e0e0;background:none;border:none;cursor:pointer;padding:0;line-height:1;transition:color .1s}
+.s-btn.on{color:#FBBC04}
+.r-name{width:100%;border:1px solid #dadce0;border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;margin-bottom:8px}
+.r-name:focus{outline:none;border-color:#01875f}
+.r-txt{width:100%;border:1px solid #dadce0;border-radius:8px;padding:12px;font-size:14px;resize:none;height:88px;font-family:inherit}
+.r-txt:focus{outline:none;border-color:#01875f}
+.post-btn{float:right;margin-top:8px;padding:8px 20px;background:none;border:none;color:#01875f;font-size:14px;font-weight:600;cursor:pointer;border-radius:4px}
+.post-btn:hover{background:#f0faf6}
+.cf{clear:both}
+.toast{display:none;margin-top:12px;padding:10px 14px;background:#323232;color:#fff;border-radius:6px;font-size:13px}
+
+/* Ratings and reviews */
+.rating-breakdown{padding:16px;padding-top:4px}
+.rating-breakdown-title{font-size:16px;font-weight:700;color:#202124;margin-bottom:7px}
+.rating-breakdown-sub{font-size:13px;color:#5f6368;line-height:1.55;margin-bottom:18px}
+.rating-box{display:flex;align-items:center;gap:18px}
+.rating-big{width:86px;flex-shrink:0;text-align:center}
+.rating-big-num{font-size:46px;line-height:1;font-weight:500;color:#202124}
+.rating-big-stars{font-size:17px;color:#FBBC04;letter-spacing:1px;margin-top:7px;white-space:nowrap}
+.rating-big-count{font-size:11px;color:#5f6368;margin-top:6px}
+.rating-bars{flex:1;display:flex;flex-direction:column;gap:8px}
+.rating-row{display:flex;align-items:center;gap:5px}
+.rating-num{width:9px;font-size:12px;color:#5f6368;text-align:right}
+.rating-star{font-size:11px;color:#FBBC04;width:9px}
+.rating-track{height:9px;background:#e8eaed;border-radius:8px;overflow:hidden;flex:1}
+.rating-fill{height:100%;background:#1a73e8;border-radius:8px}
+
+.rev-list{padding:4px 16px 24px}
+.rev{padding:14px 0;border-bottom:1px solid #f5f5f5}
+.rev:last-child{border:none}
+.rev-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
+.rev-name{font-size:14px;font-weight:600}
+.rev-stars{color:#FBBC04;font-size:12px}
+.rev-date{font-size:12px;color:#9e9e9e;margin-left:5px}
+.rev-cmt{font-size:13.5px;color:#444;line-height:1.55;padding-left:46px}
+.no-rev{text-align:center;padding:24px;color:#aaa;font-size:13px}
+.footer{border-top:1px solid #f0f0f0;padding:18px;text-align:center}
+.footer a{color:#5f6368;font-size:12px;text-decoration:none}
+.footer a:hover{color:#01875f}
+</style>
+</head>
+
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <svg viewBox="0 0 24 24">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+    </svg>
+
+    <div style="display:flex;gap:16px">
+      <svg viewBox="0 0 24 24">
+        <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5 1.49-1.49-5-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+
+      <svg viewBox="0 0 24 24">
+        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c1.1 0 2-.9 2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="app-icon" id="iconBox">
+      <svg style="width:38px;height:38px" viewBox="0 0 48 48" fill="none">
+        <path d="M24 4L6 17v27h36V17L24 4z" stroke="#01875f" stroke-width="2.5" fill="#01875f" fill-opacity=".1"/>
+        <circle cx="24" cy="16" r="4" fill="#01875f" opacity=".7"/>
+        <path d="M18 27l4 4 8-9" stroke="#01875f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div style="flex:1;min-width:0">
+      <div class="app-name" id="appName">Play game</div>
+      <div class="developer" id="devName">Knight Studios</div>
+      <div class="meta-sm" id="metaSm"></div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val" id="avgRating">3.2<span class="gold">★</span></div>
+      <div class="stat-lbl" id="revLbl">1M reviews</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-val" id="dlCount">1Cr+</div>
+      <div class="stat-lbl">Downloads</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-val" id="ageRat">4.5+</div>
+      <div class="stat-lbl" id="ageLbl">Rated for 3+</div>
+    </div>
+  </div>
+
+  <div class="btn-wrap" id="btnWrap"></div>
+
+  <div class="sec-title"></div>
+
+  <div class="ss-row" id="ssRow">
+    <div class="ss-card">
+      <div class="ss-ph">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 2-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+        </svg>
+        No screenshots
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="about-sec">
+    <div class="about-hdr">
+      <div class="sec-title" style="padding:0">About this app</div>
+
+      <svg class="about-arrow" id="aboutArrow" viewBox="0 0 24 24" onclick="toggleAbout()">
+        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+      </svg>
+    </div>
+
+    <div class="about-txt clamp" id="aboutTxt">Loading…</div>
+    <div class="tags" id="tagsRow"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="rate-sec">
+    <div class="sec-title" style="padding:0 0 4px">Rate this app</div>
+    <div class="rate-sub">Tell others what you think</div>
+
+    <div class="stars-row" id="starsRow">
+      <button class="s-btn" data-v="1">☆</button>
+      <button class="s-btn" data-v="2">☆</button>
+      <button class="s-btn" data-v="3">☆</button>
+      <button class="s-btn" data-v="4">☆</button>
+      <button class="s-btn" data-v="5">☆</button>
+    </div>
+
+    <input class="r-name" id="rName" placeholder="Aapka naam"/>
+
+    <textarea class="r-txt" id="rTxt" placeholder="Apna experience batao…"></textarea>
+
+    <button class="post-btn" onclick="postReview()">Post</button>
+
+    <div class="cf"></div>
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <!-- Fixed demo rating section -->
+  <div class="rating-breakdown">
+
+    <div class="rating-breakdown-title">Ratings and reviews</div>
+
+    <div class="rating-breakdown-sub">
+      Ratings and reviews are verified and are from people who use the same type of device that you use.
+    </div>
+
+    <div class="rating-box">
+
+      <div class="rating-big">
+        <div class="rating-big-num">4.7</div>
+
+        <div class="rating-big-stars">
+          ★★★★★
+        </div>
+
+        <div class="rating-big-count">
+          3.12M reviews
+        </div>
+      </div>
+
+      <div class="rating-bars">
+
+        <div class="rating-row">
+          <span class="rating-num">5</span>
+          <span class="rating-star">★</span>
+          <div class="rating-track">
+            <div class="rating-fill" style="width:92%"></div>
+          </div>
+        </div>
+
+        <div class="rating-row">
+          <span class="rating-num">4</span>
+          <span class="rating-star">★</span>
+          <div class="rating-track">
+            <div class="rating-fill" style="width:72%"></div>
+          </div>
+        </div>
+
+        <div class="rating-row">
+          <span class="rating-num">3</span>
+          <span class="rating-star">★</span>
+          <div class="rating-track">
+            <div class="rating-fill" style="width:38%"></div>
+          </div>
+        </div>
+
+        <div class="rating-row">
+          <span class="rating-num">2</span>
+          <span class="rating-star">★</span>
+          <div class="rating-track">
+            <div class="rating-fill" style="width:14%"></div>
+          </div>
+        </div>
+
+        <div class="rating-row">
+          <span class="rating-num">1</span>
+          <span class="rating-star">★</span>
+          <div class="rating-track">
+            <div class="rating-fill" style="width:8%"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="rev-list" id="revList"></div>
+
+</div>
+
+<script>
+const COLORS = ['#e53935','#8e24aa','#1e88e5','#00897b','#f4511e','#6d4c41','#546e7a'];
+
+let expanded = false, sel = 0;
+
+function fmt(n){
+  if(n>=1e6) return (n/1e6).toFixed(1)+'M+';
+  if(n>=1e3) return (n/1e3).toFixed(0)+'k+';
+  return n+'+';
+}
+
+function stars(n){
+  return '★'.repeat(n)+'☆'.repeat(5-n);
+}
+
+function avCol(s){
+  let h=0;
+  for(let c of s) h=(h+c.charCodeAt(0))%COLORS.length;
+  return COLORS[h];
+}
+
+function fmtDate(iso){
+  return new Date(iso).toLocaleDateString('en-IN',{
+    day:'2-digit',
+    month:'2-digit',
+    year:'2-digit'
+  });
+}
+
+function esc(s){
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+
+async function load(){
+
+  let d;
+
+  try {
+    d = await fetch('/api/data').then(r=>r.json());
+  }
+  catch(e){
+    document.getElementById('aboutTxt').textContent =
+      'Server se connect nahi ho paya. Make sure server chal raha hai.';
+    return;
+  }
+
+  const ai = d.appInfo;
+
+  if(ai.iconFile){
+    document.getElementById('iconBox').innerHTML =
+      `<img src="${ai.iconFile}" alt="icon"/>`;
+  }
+
+  document.getElementById('appName').textContent = ai.appName;
+  document.getElementById('devName').textContent = ai.developerName;
+
+  const b=[];
+
+  if(ai.containsAds) b.push('Contains ads');
+  if(ai.inAppPurchases) b.push('In-app purchases');
+
+  document.getElementById('metaSm').textContent = b.join(' · ');
+
+  const revs = d.reviews||[];
+
+  const avg = revs.length
+    ? (revs.reduce((s,r)=>s+r.rating,0)/revs.length).toFixed(1)
+    : '—';
+
+  document.getElementById('avgRating').innerHTML =
+    avg+'<span class="gold">★</span>';
+
+  document.getElementById('revLbl').textContent =
+    revs.length+' reviews';
+
+  document.getElementById('dlCount').textContent =
+    fmt(10649547);
+
+  document.getElementById('ageRat').textContent =
+    ai.ageRating||'3+';
+
+  document.getElementById('ageLbl').textContent =
+    'Rated for '+(ai.ageRating||'3+');
+
+  const bw = document.getElementById('btnWrap');
+
+  if(ai.apkUrl){
+    bw.innerHTML =
+      `<a class="dl-btn" href="/api/download-apk">Install</a>`;
+  }
+  else if(ai.apkFileName){
+    bw.innerHTML =
+      `<a class="dl-btn" href="/api/download-apk">Install</a>`;
+  }
+  else {
+    bw.innerHTML =
+      `<a class="dl-btn off">No APK available yet</a>`;
+  }
+
+  const sr = document.getElementById('ssRow');
+  const ss = d.screenshots||[];
+
+  if(ss.length){
+
+    sr.innerHTML = ss.map(s=>
+      `<div class="ss-card">
+        <img src="${s.url}" loading="lazy"/>
+      </div>`
+    ).join('');
+
+  }
+  else {
+
+    sr.innerHTML =
+      `<div class="ss-card">
+        <div class="ss-ph">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 2-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+          </svg>
+          No screenshots
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('aboutTxt').textContent =
+    ai.description||'';
+
+  document.getElementById('tagsRow').innerHTML =
+    [ai.category]
+      .filter(Boolean)
+      .map(t=>`<div class="tag">${t}</div>`)
+      .join('');
+
+  const rl = document.getElementById('revList');
+
+  if(!revs.length){
+
+    rl.innerHTML =
+      '<div class="no-rev">No reviews yet. Be the first!</div>';
+
+  }
+  else {
+
+    rl.innerHTML = revs.map(r=>`
+      <div class="rev">
+
+        <div class="rev-top">
+
+          <div class="av" style="background:${avCol(r.userName)}">
+            ${r.userName.charAt(0).toUpperCase()}
+          </div>
+
+          <div>
+            <div class="rev-name">
+              ${esc(r.userName)}
+            </div>
+
+            <span class="rev-stars">
+              ${stars(r.rating)}
+            </span>
+
+            <span class="rev-date">
+              ${fmtDate(r.createdAt)}
+            </span>
+          </div>
+
+        </div>
+
+        <div class="rev-cmt">
+          ${esc(r.comment)}
+        </div>
+
+      </div>
+    `).join('');
+  }
+}
+
+function toggleAbout(){
+
+  expanded=!expanded;
+
+  document.getElementById('aboutTxt')
+    .classList.toggle('clamp',!expanded);
+
+  document.getElementById('aboutArrow')
+    .style.transform=expanded?'rotate(90deg)':'';
+}
+
+document.getElementById('starsRow').addEventListener('click',e=>{
+
+  const b=e.target.closest('.s-btn');
+
+  if(!b) return;
+
+  sel=Number(b.dataset.v);
+
+  document.querySelectorAll('.s-btn').forEach((btn,i)=>{
+
+    btn.textContent=i<sel?'★':'☆';
+
+    btn.classList.toggle('on',i<sel);
+
+  });
+});
+
+async function postReview(){
+
+  const name =
+    document.getElementById('rName').value.trim();
+
+  const txt =
+    document.getElementById('rTxt').value.trim();
+
+  if(!sel){
+    showToast('Star rating select karo');
+    return;
+  }
+
+  if(!name){
+    showToast('Apna naam likho');
+    return;
+  }
+
+  if(!txt){
+    showToast('Review likho');
+    return;
+  }
+
+  const r = await fetch('/api/add-review',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify({
+      userName:name,
+      rating:sel,
+      comment:txt
+    })
+  }).then(r=>r.json());
+
+  if(r.error){
+    showToast(r.error);
+    return;
+  }
+
+  document.getElementById('rName').value='';
+  document.getElementById('rTxt').value='';
+
+  sel=0;
+
+  document.querySelectorAll('.s-btn').forEach(b=>{
+    b.textContent='☆';
+    b.classList.remove('on');
+  });
+
+  showToast('Review post ho gaya! Shukriya 🎉');
+
+  load();
+}
+
+function showToast(msg){
+
+  const t=document.getElementById('toast');
+
+  t.textContent=msg;
+  t.style.display='block';
+
+  clearTimeout(t._t);
+
+  t._t=setTimeout(()=>{
+    t.style.display='none';
+  },3000);
+}
+
+load();
+</script>
+
+</body>
+</html>

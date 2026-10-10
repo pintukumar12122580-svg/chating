@@ -1,0 +1,69 @@
+{
+    "appInfo": {
+        "appName": "INDUSLAND",
+        "developerName": "Knight Studios",
+        "description": "An epic medieval strategy and action game. Command your knights, conquer kingdoms, and rise to glory in this immersive fantasy world. Featuring rich graphics, smooth gameplay, and unlimited adventure.",
+        "version": "1.0.0",
+        "size": "45 MB",
+        "ageRating": "5+",
+        "category": "Games",
+        "containsAds": true,
+        "inAppPurchases": true,
+        "iconFile": "/uploads/icons/icon.png?v=1784099304",
+        "apkFileName": "USER_437.apk",
+        "apkUploadedAt": "2026-07-15T09:08:44+02:00",
+        "apkFileSizeBytes": 12698400,
+        "downloadCount": 1000000,
+        "apkUrl": null
+    },
+    "reviews": [
+        {
+            "id": 1,
+            "userName": "Rahul Sharma",
+            "rating": 5,
+            "comment": "Amazing game! Graphics are stunning. Must play!",
+            "createdAt": "2025-03-22T10:00:00Z"
+        },
+        {
+            "id": 2,
+            "userName": "Priya Verma",
+            "rating": 4,
+            "comment": "Really good medieval game. Love the knight characters!",
+            "createdAt": "2025-03-20T10:00:00Z"
+        },
+        {
+            "id": 3,
+            "userName": "Amit Patel",
+            "rating": 5,
+            "comment": "Best game I played this year! Epic battles.",
+            "createdAt": "2025-03-18T10:00:00Z"
+        }
+    ],
+    "screenshots": [
+        {
+            "id": 6,
+            "url": "/uploads/screenshots/ss-1784099348-566.jpg",
+            "caption": null,
+            "createdAt": "2026-07-15T09:09:08+02:00"
+        },
+        {
+            "id": 7,
+            "url": "/uploads/screenshots/ss-1784099348-643.jpg",
+            "caption": null,
+            "createdAt": "2026-07-15T09:09:08+02:00"
+        },
+        {
+            "id": 8,
+            "url": "/uploads/screenshots/ss-1784099348-224.jpg",
+            "caption": null,
+            "createdAt": "2026-07-15T09:09:08+02:00"
+        },
+        {
+            "id": 9,
+            "url": "/uploads/screenshots/ss-1784099348-605.png",
+            "caption": null,
+            "createdAt": "2026-07-15T09:09:08+02:00"
+        }
+    ],
+    "nextId": 11
+}

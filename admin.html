@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin — Google GAME</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Google Sans',Roboto,Arial,sans-serif;background:#f1f3f4;color:#202124}
+.topbar{background:#01875f;color:#fff;height:56px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.topbar h1{font-size:17px;font-weight:600}
+.topbar a{color:rgba(255,255,255,.85);font-size:13px;text-decoration:none}
+.topbar a:hover{color:#fff}
+.wrap{max-width:700px;margin:24px auto;padding:0 16px 60px;display:flex;flex-direction:column;gap:20px}
+.card{background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.1);overflow:hidden}
+.card-head{padding:16px 20px;border-bottom:1px solid #f0f0f0;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.card-head svg{width:20px;height:20px;fill:#01875f}
+.card-body{padding:18px 20px}
+label{display:block;font-size:11.5px;font-weight:700;color:#5f6368;letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
+input[type=text],input[type=url],textarea{width:100%;border:1px solid #dadce0;border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;color:#202124;margin-bottom:14px;background:#fff}
+input[type=text]:focus,input[type=url]:focus,textarea:focus{outline:none;border-color:#01875f;box-shadow:0 0 0 2px rgba(1,135,95,.12)}
+textarea{resize:vertical;min-height:90px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chk{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.chk input{width:16px;height:16px;cursor:pointer;margin:0;accent-color:#01875f}
+.chk label{font-size:14px;color:#202124;text-transform:none;letter-spacing:0;font-weight:400;cursor:pointer;margin:0}
+.btn{padding:10px 22px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
+.g{background:#01875f;color:#fff}.g:hover{background:#016b4d}
+.g:disabled{background:#a5d6a7;cursor:default}
+.r{background:#d32f2f;color:#fff}.r:hover{background:#b71c1c}
+.r:disabled{background:#f5a5a5;cursor:default}
+.gr{background:#e8eaed;color:#444}.gr:hover{background:#ddd}
+
+/* Tabs */
+.tab-bar{display:flex;gap:0;border-bottom:2px solid #e8eaed;margin-bottom:18px}
+.tab{padding:10px 18px;font-size:13px;font-weight:600;color:#5f6368;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s}
+.tab.active{color:#01875f;border-bottom-color:#01875f}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* Drop zone */
+.drop{border:2px dashed #dadce0;border-radius:10px;padding:24px 16px;text-align:center;cursor:pointer;position:relative;color:#5f6368;font-size:13px;transition:all .15s;margin-bottom:14px;user-select:none}
+.drop:hover,.drop.over{border-color:#01875f;color:#01875f;background:#f0faf6}
+.drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop svg{width:30px;height:30px;fill:currentColor;display:block;margin:0 auto 8px}
+.drop strong{display:block;font-size:14px;margin-bottom:3px}
+.drop small{font-size:11px;color:#aaa}
+
+/* Progress */
+.prog-wrap{display:none;margin-bottom:14px}
+.prog-track{height:8px;background:#e8eaed;border-radius:4px;overflow:hidden;margin-bottom:6px}
+.prog-fill{height:100%;background:#01875f;width:0;transition:width .25s;border-radius:4px}
+.prog-meta{font-size:12px;color:#5f6368;display:flex;justify-content:space-between}
+
+/* Status boxes */
+.sbox{border-radius:8px;padding:12px 16px;font-size:13px;margin-bottom:16px;border-left:4px solid}
+.sbox.ok  {border-left-color:#01875f;background:#f0faf6}
+.sbox.warn{border-left-color:#f9ab00;background:#fffce8}
+.sbox.err {border-left-color:#d32f2f;background:#fff5f5}
+.sbox strong{display:block;font-size:14px;margin-bottom:3px}
+
+/* Icon preview */
+.icon-prev{width:80px;height:80px;border-radius:14px;border:1px solid #e8e8e8;object-fit:cover;display:none;margin-bottom:12px}
+
+/* Screenshots grid */
+.ss-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.ss-thumb{position:relative;width:88px;height:140px;border-radius:8px;overflow:hidden;border:1px solid #e8e8e8;flex-shrink:0}
+.ss-thumb img{width:100%;height:100%;object-fit:cover}
+.ss-x{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);border:none;border-radius:50%;width:22px;height:22px;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+
+/* Reviews table */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:8px 10px;background:#f8f9fa;font-size:11px;color:#5f6368;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e8e8e8}
+.tbl td{padding:10px;border-bottom:1px solid #f5f5f5;vertical-align:top}
+.tbl tr:last-child td{border:none}
+.gold{color:#FBBC04}
+.sep{height:1px;background:#f0f0f0;margin:16px 0}
+.no-data{text-align:center;padding:20px;color:#aaa}
+
+/* Inline btn row */
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* Toast */
+.toast{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:12px 22px;border-radius:8px;font-size:13px;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" style="position:fixed;inset:0;background:#f1f3f4;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:'Google Sans',Roboto,Arial,sans-serif">
+  <div style="background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.12);padding:40px 36px;width:340px;text-align:center">
+    <div style="width:60px;height:60px;background:#01875f;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="#fff"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+    </div>
+    <h2 style="font-size:20px;color:#202124;margin-bottom:4px">Admin Login</h2>
+    <p style="font-size:13px;color:#5f6368;margin-bottom:24px">Sirf authorized log hi access kar sakte hain</p>
+    <input type="text" id="loginUser" placeholder="Username" style="width:100%;border:1px solid #dadce0;border-radius:8px;padding:11px 14px;font-size:14px;font-family:inherit;margin-bottom:12px;outline:none;box-sizing:border-box"/>
+    <input type="password" id="loginPass" placeholder="Password" style="width:100%;border:1px solid #dadce0;border-radius:8px;padding:11px 14px;font-size:14px;font-family:inherit;margin-bottom:20px;outline:none;box-sizing:border-box"/>
+    <button onclick="checkLogin()" style="width:100%;padding:12px;background:#01875f;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit">Login</button>
+    <p id="loginErr" style="color:#d32f2f;font-size:13px;margin-top:12px;display:none">Username ya password galat hai!</p>
+  </div>
+</div>
+
+<!-- MAIN ADMIN CONTENT (hidden until login) -->
+<div id="adminContent" style="display:none">
+
+<div class="topbar">
+  <h1>⚔️ Play game — Admin Panel</h1>
+  <a href="index.html">← View Store Page</a>
+</div>
+
+<div class="wrap">
+
+  <!-- APK Section -->
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm7-18L5.33 9h3.84v4h5.66V9h3.84L12 2z"/></svg>
+      APK Management
+    </div>
+    <div class="card-body">
+      <!-- Current APK status -->
+      <div id="apkStatus" class="sbox warn"><strong>No APK uploaded yet</strong>Upload your APK file below.</div>
+
+      <!-- Tabs: Upload File / Set URL -->
+      <div class="tab-bar">
+        <div class="tab active" id="tabUpload" onclick="switchTab('upload')">📁 File Upload</div>
+        <div class="tab" id="tabUrl" onclick="switchTab('url')">🔗 APK by URL</div>
+      </div>
+
+      <!-- Tab: File Upload -->
+      <div class="tab-panel active" id="panelUpload">
+        <label>Select APK File (.apk)</label>
+        <div class="drop" id="apkDrop">
+          <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
+          <strong>Click ya drag karke APK do</strong>
+          <small>.apk / .xapk — Hosting ke upload limit tak</small>
+          <input type="file" id="apkFile" accept=".apk,.xapk" onchange="apkSelected(event)"/>
+        </div>
+
+        <div class="prog-wrap" id="apkProg">
+          <div class="prog-track"><div class="prog-fill" id="apkFill"></div></div>
+          <div class="prog-meta"><span id="apkProgLbl">Uploading…</span><span id="apkProgPct">0%</span></div>
+        </div>
+
+        <div id="apkFileInfo" style="display:none;background:#f8f9fa;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px"></div>
+        <button class="btn g" id="apkBtn" onclick="uploadApk()" disabled>Pehle file select karo</button>
+
+        <div class="sep"></div>
+        <p style="font-size:12px;color:#9e9e9e;line-height:1.7">
+          ⚠️ <strong>InfinityFree note:</strong> Free hosting mein upload limit hoti hai (~10MB). Badi APK ke liye "APK by URL" tab use karo.
+        </p>
+      </div>
+
+      <!-- Tab: APK by URL -->
+      <div class="tab-panel" id="panelUrl">
+        <p style="font-size:13px;color:#5f6368;margin-bottom:14px;line-height:1.65">
+          🔗 Badi APK ko <strong>Google Drive, Dropbox, ya kisi bhi hosting</strong> pe upload karo aur yahan link paste karo.<br>
+          Users download button dabayenge toh seedha us link par jayenge.
+        </p>
+        <label>APK Direct Download URL</label>
+        <input type="url" id="apkUrlInput" placeholder="https://drive.google.com/uc?export=download&id=..."/>
+        <p style="font-size:11.5px;color:#aaa;margin-top:-10px;margin-bottom:14px">
+          💡 Google Drive: File → Share (Anyone with link) → Copy link → "drive.google.com/file/d/<b>ID</b>/view" ko "drive.google.com/uc?export=download&id=<b>ID</b>" mein badlo
+        </p>
+        <button class="btn g" onclick="setApkUrl()">🔗 APK URL Set Karo</button>
+      </div>
+
+      <!-- Delete APK button (shown only when APK exists) -->
+      <div id="deleteApkWrap" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0">
+        <p style="font-size:12px;color:#9e9e9e;margin-bottom:10px">Mojooda APK hata do aur naya upload karo:</p>
+        <button class="btn r" id="deleteApkBtn" onclick="deleteApk()">🗑️ APK Delete Karo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Icon -->
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+      App Icon
+    </div>
+    <div class="card-body">
+      <img id="iconPrev" class="icon-prev" alt="icon"/>
+      <label>Upload App Icon (PNG / JPG / WEBP)</label>
+      <div class="drop">
+        <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+        <strong>Click ya drag karke icon do</strong>
+        <small>PNG, JPG, WEBP — max 2 MB recommended</small>
+        <input type="file" id="iconFile" accept="image/*" onchange="uploadIcon(event)"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Info -->
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+      App Information
+    </div>
+    <div class="card-body">
+      <div class="row2">
+        <div><label>App Name</label><input type="text" id="fName"/></div>
+        <div><label>Developer</label><input type="text" id="fDev"/></div>
+      </div>
+      <label>Description</label>
+      <textarea id="fDesc" rows="4"></textarea>
+      <div class="row2">
+        <div><label>Version</label><input type="text" id="fVer" placeholder="1.0.0"/></div>
+        <div><label>Size</label><input type="text" id="fSize" placeholder="45 MB"/></div>
+      </div>
+      <div class="row2">
+        <div><label>Age Rating</label><input type="text" id="fAge" placeholder="3+"/></div>
+        <div><label>Category</label><input type="text" id="fCat" placeholder="Games"/></div>
+      </div>
+      <div class="chk"><input type="checkbox" id="fAds"/><label for="fAds">Contains Ads</label></div>
+      <div class="chk"><input type="checkbox" id="fIAP"/><label for="fIAP">In-app Purchases</label></div>
+      <button class="btn g" onclick="saveInfo()">💾 Save App Info</button>
+    </div>
+  </div>
+
+  <!-- Screenshots -->
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+      Screenshots
+    </div>
+    <div class="card-body">
+      <div class="ss-grid" id="ssGrid"></div>
+      <label>Upload Screenshot Images</label>
+      <div class="drop">
+        <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
+        <strong>Click ya drag karke screenshots do</strong>
+        <small>PNG, JPG — multiple select allowed</small>
+        <input type="file" id="ssFiles" accept="image/*" multiple onchange="uploadScreenshots(event)"/>
+      </div>
+      <div class="sep"></div>
+      <label>Ya Image URL se add karo</label>
+      <input type="text" id="ssUrl" placeholder="https://example.com/screenshot.png"/>
+      <button class="btn gr" onclick="addSSUrl()">Add by URL</button>
+    </div>
+  </div>
+
+  <!-- Reviews -->
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+      User Reviews
+    </div>
+    <div class="card-body" style="padding:0 0 4px">
+      <table class="tbl">
+        <thead><tr><th>User</th><th>Rating</th><th>Review</th><th></th></tr></thead>
+        <tbody id="revBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div><!-- /adminContent -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Login ─────────────────────────────────────────────────────────────────────
+function checkLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value.trim();
+  if(u==='test' && p==='test.html'){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminContent').style.display='block';
+    loadData();
+  } else {
+    document.getElementById('loginErr').style.display='block';
+    document.getElementById('loginPass').value='';
+    document.getElementById('loginPass').focus();
+  }
+}
+document.getElementById('loginPass').addEventListener('keydown',function(e){ if(e.key==='Enter') checkLogin(); });
+document.getElementById('loginUser').addEventListener('keydown',function(e){ if(e.key==='Enter') document.getElementById('loginPass').focus(); });
+</script>
+<script>
+let apkFile = null;
+
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result.split(',')[1]);
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── Tab switcher ──────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('tabUpload').classList.toggle('active', tab==='upload');
+  document.getElementById('tabUrl').classList.toggle('active', tab==='url');
+  document.getElementById('panelUpload').classList.toggle('active', tab==='upload');
+  document.getElementById('panelUrl').classList.toggle('active', tab==='url');
+}
+
+// ── Load ──────────────────────────────────────────────────────────────────────
+async function loadData(){
+  const d = await fetch('/api/data').then(r=>r.json()).catch(()=>null);
+  if(!d){ toast('Server se connect nahi ho paya'); return; }
+
+  const ai = d.appInfo;
+  const box = document.getElementById('apkStatus');
+  const delWrap = document.getElementById('deleteApkWrap');
+
+  if(ai.apkUrl){
+    const dt = ai.apkUploadedAt ? new Date(ai.apkUploadedAt).toLocaleString('en-IN') : '';
+    box.className='sbox ok';
+    box.innerHTML=`<strong>✅ APK URL Set hai</strong>Link: <a href="${esc(ai.apkUrl)}" target="_blank" style="color:#01875f;word-break:break-all">${esc(ai.apkUrl)}</a><br><span style="color:#888;font-size:12px">Set on: ${dt}</span><br><a href="/api/download-apk" style="color:#01875f;font-weight:600;font-size:12px;margin-top:4px;display:inline-block">⬇ Test Download</a>`;
+    delWrap.style.display='block';
+  } else if(ai.apkFileName){
+    const sz = ai.apkFileSizeBytes ? (ai.apkFileSizeBytes/1024/1024).toFixed(1)+' MB' : '';
+    const dt = ai.apkUploadedAt ? new Date(ai.apkUploadedAt).toLocaleString('en-IN') : '';
+    box.className='sbox ok';
+    box.innerHTML=`<strong>✅ APK: ${esc(ai.apkFileName)}</strong>Size: ${sz} &nbsp;·&nbsp; Uploaded: ${dt}<br><a href="/api/download-apk" style="color:#01875f;font-weight:600;font-size:12px;margin-top:4px;display:inline-block">⬇ Test Download</a>`;
+    delWrap.style.display='block';
+  } else {
+    box.className='sbox warn';
+    box.innerHTML='<strong>No APK set yet</strong>File upload karo ya URL set karo neeche se.';
+    delWrap.style.display='none';
+  }
+
+  if(ai.iconFile){
+    const img=document.getElementById('iconPrev');
+    img.src=ai.iconFile; img.style.display='block';
+  }
+
+  document.getElementById('fName').value = ai.appName||'';
+  document.getElementById('fDev').value  = ai.developerName||'';
+  document.getElementById('fDesc').value = ai.description||'';
+  document.getElementById('fVer').value  = ai.version||'';
+  document.getElementById('fSize').value = ai.size||'';
+  document.getElementById('fAge').value  = ai.ageRating||'';
+  document.getElementById('fCat').value  = ai.category||'';
+  document.getElementById('fAds').checked = !!ai.containsAds;
+  document.getElementById('fIAP').checked = !!ai.inAppPurchases;
+
+  if(ai.apkUrl) document.getElementById('apkUrlInput').value = ai.apkUrl;
+
+  const sg = document.getElementById('ssGrid');
+  const ss = d.screenshots||[];
+  if(!ss.length){ sg.innerHTML='<span style="color:#aaa;font-size:13px">No screenshots yet.</span>'; }
+  else sg.innerHTML = ss.map(s=>`
+    <div class="ss-thumb">
+      <img src="${s.url}" loading="lazy"/>
+      <button class="ss-x" onclick="deleteSS(${s.id})">✕</button>
+    </div>`).join('');
+
+  const tb = document.getElementById('revBody');
+  const revs = d.reviews||[];
+  if(!revs.length){ tb.innerHTML='<tr><td colspan="4" class="no-data">No reviews yet</td></tr>'; }
+  else tb.innerHTML = revs.map(r=>`
+    <tr>
+      <td><strong>${esc(r.userName)}</strong><br><span style="color:#aaa;font-size:11px">${new Date(r.createdAt).toLocaleDateString('en-IN')}</span></td>
+      <td><span class="gold">${'★'.repeat(r.rating)+'☆'.repeat(5-r.rating)}</span></td>
+      <td style="max-width:200px;word-break:break-word">${esc(r.comment)}</td>
+      <td><button class="btn r" style="padding:5px 12px;font-size:12px" onclick="deleteReview(${r.id})">Delete</button></td>
+    </tr>`).join('');
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── APK Upload (Base64 JSON) ──────────────────────────────────────────────────
+function apkSelected(e){
+  apkFile = e.target.files[0]; if(!apkFile) return;
+  const sz = (apkFile.size/1024/1024).toFixed(1);
+  document.getElementById('apkFileInfo').style.display='block';
+  document.getElementById('apkFileInfo').innerHTML=`📦 <strong>${apkFile.name}</strong> — ${sz} MB`;
+  const btn=document.getElementById('apkBtn');
+  btn.disabled=false; btn.textContent='⬆ Upload APK';
+}
+
+async function uploadApk(){
+  if(!apkFile){ toast('Pehle APK select karo'); return; }
+  const btn=document.getElementById('apkBtn');
+  btn.disabled=true; btn.textContent='Uploading…';
+  const prog=document.getElementById('apkProg');
+  const fill=document.getElementById('apkFill');
+  const lbl =document.getElementById('apkProgLbl');
+  const pct =document.getElementById('apkProgPct');
+  prog.style.display='block'; fill.style.width='50%'; pct.textContent='…'; lbl.textContent='Converting file…';
+
+  try{
+    const b64 = await fileToBase64(apkFile);
+    fill.style.width='80%'; pct.textContent='…'; lbl.textContent='Uploading to server…';
+    const r = await fetch('/api/upload-apk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fileName:apkFile.name,data:b64})}).then(r=>r.json());
+    if(r.ok){
+      fill.style.width='100%'; pct.textContent='100%'; lbl.textContent='Upload complete! ✅';
+      toast('APK upload ho gaya! ✅');
+      apkFile=null; document.getElementById('apkFile').value='';
+      document.getElementById('apkFileInfo').style.display='none';
+      btn.disabled=true; btn.textContent='Pehle file select karo';
+      setTimeout(()=>{ prog.style.display='none'; fill.style.width='0'; },2500);
+      loadData();
+    } else {
+      prog.style.display='none';
+      toast('Upload failed: '+(r.error||'Unknown error'));
+      btn.disabled=false; btn.textContent='Retry Upload';
+    }
+  }catch(err){
+    prog.style.display='none';
+    toast('Connection error — server se connect nahi ho paya');
+    btn.disabled=false; btn.textContent='Retry Upload';
+  }
+}
+
+// ── APK by URL ────────────────────────────────────────────────────────────────
+async function setApkUrl(){
+  const url = document.getElementById('apkUrlInput').value.trim();
+  if(!url){ toast('URL enter karo'); return; }
+  if(!url.startsWith('http')){ toast('Valid URL chahiye (http:// ya https://)'); return; }
+  const r = await fetch('/api/set-apk-url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})}).then(r=>r.json()).catch(()=>({error:'Failed'}));
+  if(r.ok){ toast('APK URL set ho gaya! ✅'); loadData(); }
+  else toast('Error: '+(r.error||'unknown'));
+}
+
+// ── Delete APK ────────────────────────────────────────────────────────────────
+async function deleteApk(){
+  if(!confirm('APK delete karo? Users download nahi kar payenge jab tak naya APK ya URL set na ho.')) return;
+  const btn = document.getElementById('deleteApkBtn');
+  btn.disabled=true; btn.textContent='Deleting…';
+  const r = await fetch('/api/delete-apk',{method:'POST',headers:{'Content-Type':'application/json'}}).then(r=>r.json()).catch(()=>({error:'Failed'}));
+  btn.disabled=false; btn.textContent='🗑️ APK Delete Karo';
+  if(r.ok){
+    toast('APK delete ho gaya ✅');
+    document.getElementById('apkUrlInput').value='';
+    loadData();
+  } else toast('Delete nahi hua: '+(r.error||'error'));
+}
+
+// ── Icon Upload (Base64 JSON) ─────────────────────────────────────────────────
+async function uploadIcon(e){
+  const file=e.target.files[0]; if(!file) return;
+  try{
+    const b64 = await fileToBase64(file);
+    const r=await fetch('/api/upload-icon',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fileName:file.name,data:b64})}).then(r=>r.json()).catch(()=>({error:'Failed'}));
+    if(r.ok){
+      document.getElementById('iconPrev').src=r.iconUrl+'?nocache='+Date.now();
+      document.getElementById('iconPrev').style.display='block';
+      toast('Icon save ho gaya! ✅');
+    } else toast('Icon upload failed: '+(r.error||'unknown'));
+  }catch(err){ toast('Icon upload failed'); }
+}
+
+// ── Save App Info ─────────────────────────────────────────────────────────────
+async function saveInfo(){
+  const body={
+    appName:      document.getElementById('fName').value,
+    developerName:document.getElementById('fDev').value,
+    description:  document.getElementById('fDesc').value,
+    version:      document.getElementById('fVer').value,
+    size:         document.getElementById('fSize').value,
+    ageRating:    document.getElementById('fAge').value,
+    category:     document.getElementById('fCat').value,
+    containsAds:  document.getElementById('fAds').checked,
+    inAppPurchases: document.getElementById('fIAP').checked,
+  };
+  const r=await fetch('/api/update-info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json()).catch(()=>({error:'Failed'}));
+  if(r.ok) toast('App info save ho gaya! ✅'); else toast('Save nahi hua: '+(r.error||'error'));
+}
+
+// ── Screenshots (Base64 JSON) ─────────────────────────────────────────────────
+async function uploadScreenshots(e){
+  const files=[...e.target.files]; if(!files.length) return;
+  toast('Uploading '+files.length+' screenshot(s)…');
+  for(const file of files){
+    const b64 = await fileToBase64(file);
+    await fetch('/api/upload-screenshot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fileName:file.name,data:b64})});
+  }
+  toast(files.length+' screenshot(s) add ho gaye! ✅');
+  e.target.value=''; loadData();
+}
+
+async function addSSUrl(){
+  const url=document.getElementById('ssUrl').value.trim();
+  if(!url){ toast('URL enter karo'); return; }
+  const r=await fetch('/api/add-screenshot-url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})}).then(r=>r.json());
+  if(r.id){ toast('Screenshot add ho gaya! ✅'); document.getElementById('ssUrl').value=''; loadData(); }
+  else toast('Error: '+(r.error||'unknown'));
+}
+
+async function deleteSS(id){
+  if(!confirm('Screenshot delete karo?')) return;
+  await fetch('/api/delete-screenshot/'+id,{method:'DELETE'});
+  toast('Screenshot delete ho gaya'); loadData();
+}
+
+// ── Reviews ───────────────────────────────────────────────────────────────────
+async function deleteReview(id){
+  if(!confirm('Ye review delete karo?')) return;
+  await fetch('/api/delete-review/'+id,{method:'DELETE'});
+  toast('Review delete ho gaya'); loadData();
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  clearTimeout(t._t); t._t=setTimeout(()=>t.style.display='none',3500);
+}
+
+// Drag-over highlight
+document.querySelectorAll('.drop').forEach(el=>{
+  el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('over');});
+  el.addEventListener('dragleave',()=>el.classList.remove('over'));
+  el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('over');});
+});
+
+</script>
+</body>
+</html>

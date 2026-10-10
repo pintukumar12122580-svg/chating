@@ -1,0 +1,16 @@
+{
+  "name": "knight-game-server",
+  "version": "1.0.0",
+  "description": "Knight Game Web Server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "knight",
+    "game",
+    "railway"
+  ],
+  "author": "",
+  "license": "MIT"
+}
